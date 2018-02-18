@@ -7,6 +7,7 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+import datetime
 
 class Ui_DailySchedule(object):
     def setupUi(self, DailySchedule):
@@ -118,3 +119,16 @@ class Ui_DailySchedule(object):
         item.setText(_translate("DailySchedule", "4:30 pm"))
         self.tableWidget.setSortingEnabled(__sortingEnabled)
 
+
+class DailySchedule(QtWidgets.QFrame, Ui_DailySchedule):
+    def __init__(self, parent=None):
+        super(DailySchedule, self).__init__(parent)
+        self.setupUi(self)
+        self.set_date()
+
+    def set_date(self):
+        today = datetime.date.today()
+        self.label.setText(today.strftime('%B %d %Y'))
+        width = self.label.fontMetrics().boundingRect(self.label.text()).width()
+        height = self.label.fontMetrics().boundingRect(self.label.text()).height()
+        self.label.resize(width, height)

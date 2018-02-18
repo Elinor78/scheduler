@@ -33,3 +33,7 @@ class Ui_Logout(object):
         Logout.setWindowTitle(_translate("Logout", "Dialog"))
         self.label.setText(_translate("Logout", "Are you sure you want to log out?"))
 
+class Logout(QtWidgets.QDialog, Ui_Logout):
+    def __init__(self, user, parent=None):
+        super(Logout, self).__init__(parent)
+        self.setupUi(self) 

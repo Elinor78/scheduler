@@ -44,3 +44,7 @@ class Ui_ViewNotifications(object):
         item = self.tableWidget.horizontalHeaderItem(3)
         item.setText(_translate("ViewNotifications", "Accept/Decline"))
 
+class ViewNotifications(QtWidgets.QFrame, Ui_ViewNotifications):
+    def __init__(self, user, parent=None):
+        super(ViewNotifications, self).__init__(parent)
+        self.setupUi(self) 
