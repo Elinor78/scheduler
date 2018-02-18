@@ -8,6 +8,70 @@ import dailyschedule
 import login
 import forgotpassword
 import schedulemeeting
+import viewcalendar
+import viewprofile
+import viewnotifications
+import logout
+import managerooms
+import addroom
+import manageusers
+
+class AddUser(QtWidgets.QFrame, addroom.Ui_AddRoom):
+    def __init__(self, user, parent=None):
+        super(AddUser, self).__init__(parent)
+        self.setupUi(self)  
+
+class ManageUsers(QtWidgets.QFrame, manageusers.Ui_ManageUsers):
+    def __init__(self, user, parent=None):
+        super(ManageUsers, self).__init__(parent)
+        self.setupUi(self)  
+        self.user = user
+        self.add_user_button.clicked.connect(lambda: self.showAddUser(parent))
+
+
+    def showAddUser(self, parent):
+        parent.frame.hide()
+        parent.frame = AddUser(self.user, parent)
+        parent.frame.show()   
+
+class AddRoom(QtWidgets.QFrame, addroom.Ui_AddRoom):
+    def __init__(self, user, parent=None):
+        super(AddRoom, self).__init__(parent)
+        self.setupUi(self)     
+
+class ManageRooms(QtWidgets.QFrame, managerooms.Ui_ManageRooms):
+    def __init__(self, user, parent=None):
+        super(ManageRooms, self).__init__(parent)
+        self.setupUi(self)
+        self.user = user
+        self.add_room_button.clicked.connect(lambda: self.showAddRoom(parent))
+
+
+    def showAddRoom(self, parent):
+        parent.frame.hide()
+        parent.frame = AddRoom(self.user, parent)
+        parent.frame.show()
+
+
+class Logout(QtWidgets.QDialog, logout.Ui_Logout):
+    def __init__(self, user, parent=None):
+        super(Logout, self).__init__(parent)
+        self.setupUi(self)    
+
+class ViewNotifications(QtWidgets.QFrame, viewnotifications.Ui_ViewNotifications):
+    def __init__(self, user, parent=None):
+        super(ViewNotifications, self).__init__(parent)
+        self.setupUi(self) 
+
+class ViewCalendar(QtWidgets.QFrame, viewcalendar.Ui_ViewCalendar):
+    def __init__(self, user, parent=None):
+        super(ViewCalendar, self).__init__(parent)
+        self.setupUi(self)  
+
+class ViewProfile(QtWidgets.QFrame, viewprofile.Ui_ViewProfile):   
+    def __init__(self, user, parent=None):
+        super(ViewProfile, self).__init__(parent)
+        self.setupUi(self) 
 
 class ScheduleMeeting(QtWidgets.QFrame, schedulemeeting.Ui_schedulemeeting):
     def __init__(self, user, parent=None):
@@ -108,32 +172,46 @@ class Scheduler(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow):
         return True
 
     def showDailySchedule(self):
+        self.frame.hide()
         self.frame = DailySchedule(self)
         self.frame.show()
 
     def showScheduleMeeting(self):
+        self.frame.hide()
         self.frame = ScheduleMeeting(self.user, self)
         self.frame.show()        
 
     def showViewCalendar(self):
-        print("view calendar")
+        self.frame.hide()
+        self.frame = ViewCalendar(self.user, self)
+        self.frame.show()
         
 
     def showProfile(self):
-        print("showProfile")
+        self.frame.hide()
+        self.frame = ViewProfile(self.user, self)
+        self.frame.show()
 
     def showNotifications(self):
-        print("showNotifications")
+        self.frame.hide()
+        self.frame = ViewNotifications(self.user, self)
+        self.frame.show()
 
     def showLogout(self):
         print("showLogout")
+        self.frame.hide()
+        self.frame = Logout(self.user, self)
+        self.frame.show()
 
     def showManageRooms(self):
-        print("showManageRooms")
+        self.frame.hide()
+        self.frame = ManageRooms(self.user, self)
+        self.frame.show()
 
     def showManageUsers(self):
-        print("showManageUsers")
-
+        self.frame.hide()
+        self.frame = ManageUsers(self.user, self)
+        self.frame.show()
 def main():
     app = QtWidgets.QApplication(sys.argv)
     login = Login()
