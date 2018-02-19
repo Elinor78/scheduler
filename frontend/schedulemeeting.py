@@ -163,3 +163,27 @@ class Ui_schedulemeeting(object):
         self.pushButton.setText(_translate("schedulemeeting", "Save"))
         self.pushButton_2.setText(_translate("schedulemeeting", "Add Participant"))
 
+
+class ScheduleMeeting(QtWidgets.QFrame, Ui_schedulemeeting):
+    def __init__(self, user, parent=None):
+        super(ScheduleMeeting, self).__init__(parent)
+        self.setupUi(self) 
+        
+
+    def add_participant(self):
+        pass
+        #TODO search box for finding participant
+            #if click on one and OK, then call self.tableWidget.add_participant 
+            # with user info
+            # if click cancel, pass, basically
+
+
+    def save_meeting(self):
+        pass
+        #TODO - whole bunch
+
+
+
+
+
+        

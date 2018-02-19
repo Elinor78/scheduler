@@ -46,3 +46,8 @@ class Ui_ViewCalendar(object):
         item = self.tableWidget.horizontalHeaderItem(2)
         item.setText(_translate("ViewCalendar", "Modify"))
 
+
+class ViewCalendar(QtWidgets.QFrame, Ui_ViewCalendar):
+    def __init__(self, user, parent=None):
+        super(ViewCalendar, self).__init__(parent)
+        self.setupUi(self) 

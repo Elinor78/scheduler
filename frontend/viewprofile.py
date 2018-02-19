@@ -13,7 +13,7 @@ class Ui_ViewProfile(object):
         ViewProfile.setObjectName("ViewProfile")
         ViewProfile.resize(581, 391)
         ViewProfile.setGeometry(QtCore.QRect(230, 30, 581, 391))
-        
+
         self.formLayoutWidget = QtWidgets.QWidget(ViewProfile)
         self.formLayoutWidget.setGeometry(QtCore.QRect(40, 40, 471, 181))
         self.formLayoutWidget.setObjectName("formLayoutWidget")
@@ -80,3 +80,7 @@ class Ui_ViewProfile(object):
         self.change_password_button.setText(_translate("ViewProfile", "Change Password"))
         self.save_button.setText(_translate("ViewProfile", "Save"))
 
+class ViewProfile(QtWidgets.QFrame, Ui_ViewProfile):   
+    def __init__(self, user, parent=None):
+        super(ViewProfile, self).__init__(parent)
+        self.setupUi(self) 
