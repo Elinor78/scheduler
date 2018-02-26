@@ -1,9 +1,13 @@
 from PyQt5 import QtWidgets, QtCore
 import sys
+from backend.utils import EmployeeData
+
+employee_data = EmployeeData()
 
 class ScheduleTableWidget(QtWidgets.QTableWidget):
 	def __init__(self, user, parent=None):
 		super(ScheduleTableWidget, self).__init__(parent)
+		self.user = user
 		self.setColumnCount(17)
 		self.setRowCount(2)
 		self.available_checkboxes = []
@@ -17,6 +21,7 @@ class ScheduleTableWidget(QtWidgets.QTableWidget):
 
 
 	def owner_availability(self):
+		#TODO: get data
 		fake_owner_data = [True, False]*8
 
 		for i, is_available in enumerate(fake_owner_data):
@@ -30,7 +35,9 @@ class ScheduleTableWidget(QtWidgets.QTableWidget):
 
 
 
-	def add_participant(self):
+	def add_participant(self, username):
+		#TODO: get data
+
 		fake_participant_data = [False, False, True, False]*4
 		rowPosition = self.rowCount()
 		self.insertRow(rowPosition)
@@ -65,11 +72,16 @@ class ScheduleCheckBoxWidget(QtWidgets.QWidget):
 		self.setLayout(lay_out)
 
 
+
+
+
 if __name__ == "__main__":
 	app = QtWidgets.QApplication(sys.argv)
-	form = ScheduleTableWidget(user="fake")
+	#form = ScheduleTableWidget(user="fake")
 
-	form.show()
-	form.add_participant()
+	#form.show()
+	#form.add_participant()
+	search = EmployeeSearchWidget()
+	search.show()
 	app.exec_()
 

@@ -8,6 +8,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from custom_widgets import ScheduleTableWidget
+import datetime
 
 class Ui_schedulemeeting(object):
     def setupUi(self, schedulemeeting):
@@ -55,7 +56,7 @@ class Ui_schedulemeeting(object):
         self.textEdit.setMaximumSize(QtCore.QSize(16777215, 50))
         self.textEdit.setObjectName("textEdit")
         self.formLayout.setWidget(4, QtWidgets.QFormLayout.FieldRole, self.textEdit)
-        self.tableWidget = ScheduleTableWidget(self.formLayoutWidget)
+        self.tableWidget = ScheduleTableWidget(self.user, self.formLayoutWidget)
         self.tableWidget.setMaximumSize(QtCore.QSize(16777215, 100))
         self.tableWidget.setObjectName("tableWidget")
         self.tableWidget.setColumnCount(17)
@@ -102,12 +103,12 @@ class Ui_schedulemeeting(object):
         item.setFlags(QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
         self.tableWidget.setItem(0, 1, item)
         self.formLayout.setWidget(5, QtWidgets.QFormLayout.SpanningRole, self.tableWidget)
-        self.pushButton = QtWidgets.QPushButton(schedulemeeting)
-        self.pushButton.setGeometry(QtCore.QRect(480, 330, 81, 32))
-        self.pushButton.setObjectName("pushButton")
-        self.pushButton_2 = QtWidgets.QPushButton(schedulemeeting)
-        self.pushButton_2.setGeometry(QtCore.QRect(350, 330, 131, 32))
-        self.pushButton_2.setObjectName("pushButton_2")
+        self.save_button = QtWidgets.QPushButton(schedulemeeting)
+        self.save_button.setGeometry(QtCore.QRect(480, 330, 81, 32))
+        self.save_button.setObjectName("save_button")
+        self.add_participant_button = QtWidgets.QPushButton(schedulemeeting)
+        self.add_participant_button.setGeometry(QtCore.QRect(350, 330, 131, 32))
+        self.add_participant_button.setObjectName("add_participant_button")
 
         self.retranslateUi(schedulemeeting)
         QtCore.QMetaObject.connectSlotsByName(schedulemeeting)
@@ -160,30 +161,134 @@ class Ui_schedulemeeting(object):
         __sortingEnabled = self.tableWidget.isSortingEnabled()
         self.tableWidget.setSortingEnabled(False)
         self.tableWidget.setSortingEnabled(__sortingEnabled)
-        self.pushButton.setText(_translate("schedulemeeting", "Save"))
-        self.pushButton_2.setText(_translate("schedulemeeting", "Add Participant"))
+        self.save_button.setText(_translate("schedulemeeting", "Save"))
+        self.add_participant_button.setText(_translate("schedulemeeting", "Add Participant"))
 
 
 class ScheduleMeeting(QtWidgets.QFrame, Ui_schedulemeeting):
     def __init__(self, user, parent=None):
         super(ScheduleMeeting, self).__init__(parent)
+        self.user = user
         self.setupUi(self) 
+        self.add_participant_button.clicked.connect(self._add_participant)
+        self.save_button.clicked.connect(self.save_meeting)
+        self.to_add_participant = None
+
         
 
-    def add_participant(self):
-        pass
+    def _add_participant(self):
         #TODO search box for finding participant
             #if click on one and OK, then call self.tableWidget.add_participant 
             # with user info
             # if click cancel, pass, basically
 
+        print("here")
+        self.search = SearchParticipant(self)
+        self.search.show()
+
+        print("here 2")
+        print(self.search.to_add_participant)
+
+    def add_participant(self, username):
+        print ("here 3")
+
+        print(self.tableWidget)
+        self.tableWidget.add_participant(username)
 
     def save_meeting(self):
-        pass
         #TODO - whole bunch
+        print("A")
+        self._check_date()
+        print(self.titleLineEdit.text())
+        print(self.dateDateEdit.text())
+        print(self.tableWidget.participants)
+        print("B")
+
+    def _check_date(self):
+        print(type(self.dateDateEdit.text()))
+        #print(datetime.date(self.dateDateEdit.text()))
+        _date = datetime.datetime.strptime(self.dateDateEdit.text(), '%B %d, %Y').date()
+        margin = datetime.timedelta(days=14)
+        today = datetime.date.today()
+        print (_date.weekday())
+        #weekday is less than 5
+        if _date.weekday() >= 5:#saturday and sunday
+            QtWidgets.QMessageBox.warning(
+                    self, 'Error', 'Cannot schedule meetings on weekends')
+        if today < _date < today + margin:
+            pass
+        else:
+            QtWidgets.QMessageBox.warning(
+                    self, 'Error', 'Meetings must be scheduled within 14 days of today')    
+
+    def _check_title(self):
+        print(self.dateDateEdit.text())    
 
 
 
+class Ui_SearchParticipant(object):
+    def setupUi(self, SearchParticipant):
+        SearchParticipant.setObjectName("SearchParticipant")
+        SearchParticipant.resize(350, 112)
+
+
+        self.formLayoutWidget = QtWidgets.QWidget(SearchParticipant)
+        self.formLayoutWidget.setGeometry(QtCore.QRect(20, 60, 311, 41))
+        self.formLayoutWidget.setObjectName("formLayoutWidget")
+        self.formLayout = QtWidgets.QFormLayout(self.formLayoutWidget)
+        self.formLayout.setContentsMargins(0, 0, 0, 0)
+        self.formLayout.setObjectName("formLayout")
+        self.search_lineedit = EmployeeSearchWidget(self.formLayoutWidget)
+        self.search_lineedit.setObjectName("search_lineedit")
+        self.formLayout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.search_lineedit)
+        self.Add_button = QtWidgets.QPushButton(self.formLayoutWidget)
+        self.Add_button.setObjectName("Add_button")
+        self.formLayout.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.Add_button)
+        self.label = QtWidgets.QLabel(SearchParticipant)
+        self.label.setGeometry(QtCore.QRect(20, 10, 171, 31))
+        self.label.setObjectName("label")
+
+        self.retranslateUi(SearchParticipant)
+        QtCore.QMetaObject.connectSlotsByName(SearchParticipant)
+
+    def retranslateUi(self, SearchParticipant):
+        _translate = QtCore.QCoreApplication.translate
+        SearchParticipant.setWindowTitle(_translate("SearchParticipant", "Form"))
+        self.Add_button.setText(_translate("SearchParticipant", "Add"))
+        self.label.setText(_translate("SearchParticipant", "Search for participant"))
+
+class SearchParticipant(QtWidgets.QDialog, Ui_SearchParticipant):
+    def __init__(self, parent=None):
+        super(SearchParticipant, self).__init__(parent)  
+        self.setupUi(self) 
+        self.to_add_participant = None
+        self.Add_button.clicked.connect(self.add)
+
+    def add(self):
+        self.to_add_participant = self.search_lineedit.text()
+        print(self.to_add_participant)
+        print(self.parent())
+        self.parent().add_participant(self.to_add_participant)
+        self.close()
+
+from backend.utils import EmployeeData
+
+class EmployeeSearchWidget(QtWidgets.QLineEdit):
+    def __init__(self, parent=None):
+        super(EmployeeSearchWidget, self).__init__(parent)
+        #self.edit = QtWidgets.QLineEdit()
+        completer = QtWidgets.QCompleter()
+        self.setCompleter(completer)
+
+
+
+        model = QtCore.QStringListModel()
+        completer.setModel(model)
+        model.setStringList(self.get_employees())
+
+    def get_employees(self):
+        employeedata = EmployeeData()
+        return [e.username for e in employeedata.get_all_employees()]
 
 
         

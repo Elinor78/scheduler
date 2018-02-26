@@ -1,4 +1,4 @@
-from models import Base, session, init_db, Employee, EmployeeMeeting, Meeting, Room
+from backend.models import Base, session, init_db, Employee, EmployeeMeeting, Meeting, Room
 import os
 
 
@@ -7,6 +7,7 @@ class EmployeeData:
 		employee = Employee(username=username, password=password)
 		session.add(employee)
 		session.commit()
+		return self.get_employee_by_username(username)
 
 	def delete_employee(self, employee_id):
 		employee = session.query(Employee).filter(Employee.id == employee_id).one()
@@ -36,6 +37,14 @@ class EmployeeData:
 		employee_meeting = EmployeeMeeting(meeting_id=meeting_id, employee_id=employee_id)
 		session.add(employee_meeting)
 		session.commit()
+
+	def update_employee(self, employee_id, kwargs):
+		employee = self.get_employee(employee_id)
+		for kwarg, value in kwargs.items():
+			setattr(employee, kwarg, value)
+		session.commit()
+		return self.get_employee(employee_id)
+
 
 class MeetingData:
 	def add_meeting(self):
@@ -68,7 +77,7 @@ if __name__ == '__main__':
 
 
 	# deleting the db so it migrates on changes
-	dirname = os.path.dirname
-	os.remove(os.path.abspath(os.path.join(dirname(dirname(__file__)), "sqlalchemy_example.db")))
+	#dirname = os.path.dirname
+	#os.remove(os.path.abspath(os.path.join(dirname(dirname(__file__)), "sqlalchemy_example.db")))
 
 

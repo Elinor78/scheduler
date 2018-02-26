@@ -8,6 +8,9 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+from backend.utils import EmployeeData
+from sqlalchemy.orm.exc import NoResultFound
+
 class Ui_Login(object):
     def setupUi(self, Login):
         Login.setObjectName("Login")
@@ -136,14 +139,27 @@ class ForgotPassword(QtWidgets.QDialog, Ui_ForgotPassword):
         self.accept() 
 
     def submit_change(self):
-        #TODO: hook up to db
-        #STUB
-        if self.username_lineedit.text() and self.email_lineedit.text():
-            self.accept()
-        else:
-            QtWidgets.QMessageBox.warning(
+        '''
+        If an employee submits a request that they forgot their password,
+        a notification is sent to the admin. It is then the admin's job to change
+        the employee's password and notify that employee outside of the system
+        of that change.
+        If the input email does not match the saved email, an error is thrown and 
+        no password notification is sent.
+        
+        TODO: implement password change notifications
+        '''
+        employeedata = EmployeeData()
+        try:
+            user = employeedata.get_employee_by_username(self.username_lineedit.text())
+            if user.email != self.email_lineedit.text() or self.email_lineedit == '':
+                QtWidgets.QMessageBox.warning(
                 self, 'Error', 'Bad user or email') 
-
+            #TODO: NOTIFICATION
+            self.accept()
+        except NoResultFound:
+            QtWidgets.QMessageBox.warning(
+                self, 'Error', 'Bad user or email')
 
 class Login(QtWidgets.QDialog, Ui_Login):
     def __init__(self, parent=None):
@@ -153,12 +169,16 @@ class Login(QtWidgets.QDialog, Ui_Login):
         self.forgot_password_button.clicked.connect(self.forgot_password)
         
     def handleLogin(self):
-        #TODO: hook up to user DB
-        if (self.username_lineedit.text() == 'foo' and
-            self.password_lineedit.text() == 'bar'):
-            self.user = self.username_lineedit.text()
-            self.accept()
-        else:
+        employeedata = EmployeeData()
+        try:
+            user = employeedata.get_employee_by_username(self.username_lineedit.text())
+            if user.password == self.password_lineedit.text():
+                self.user = user
+                self.accept()
+            else:
+                QtWidgets.QMessageBox.warning(
+                    self, 'Error', 'Bad user or password')                 
+        except NoResultFound:
             QtWidgets.QMessageBox.warning(
                 self, 'Error', 'Bad user or password') 
 
