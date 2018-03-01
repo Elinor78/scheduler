@@ -3,8 +3,10 @@ import sys
 import enum
 from sqlalchemy import Column, ForeignKey, String, Integer, Boolean, Date, Table, Enum, UniqueConstraint
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, scoped_session, sessionmaker
+from sqlalchemy.orm import relationship, scoped_session, sessionmaker, column_property
 from sqlalchemy import create_engine
+from sqlalchemy.ext.hybrid import hybrid_property
+
 
 
 Base = declarative_base()
@@ -29,7 +31,7 @@ class Employee(Base):
     username = Column(String(100), unique=True, nullable=False)
     password = Column(String(100), nullable=False)
     email = Column(String(100), nullable=True)
-    job_title = Column(String(100), nullable=True)
+    telephone = Column(String(100), nullable=True)
     is_admin = Column(Boolean, default=False)
     meetings = relationship("EmployeeMeeting", back_populates='employee')
 
@@ -53,9 +55,11 @@ class Meeting(Base):
 class Room(Base):
     __tablename__ = "room"
     id = Column(Integer, primary_key=True)
+    roomname = Column(String, unique=True, nullable=False)
     number = Column(Integer, nullable=False)
     building = Column(Integer, nullable=False)
     capacity = Column(Integer, nullable=True)
+
 
     __table_args__ = (UniqueConstraint('number', 'building', name='room_uc'),)
 

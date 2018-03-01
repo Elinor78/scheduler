@@ -37,6 +37,7 @@ class ScheduleTableWidget(QtWidgets.QTableWidget):
 
 	def add_participant(self, username):
 		#TODO: get data
+		#TODO: save to participants attribute
 
 		fake_participant_data = [False, False, True, False]*4
 		rowPosition = self.rowCount()
@@ -55,6 +56,23 @@ class ScheduleTableWidget(QtWidgets.QTableWidget):
 	def check_availability(self):
 		pass 
 
+	def add_room(self, roomname):
+		#TODO: get data
+		#TODO: save to room attribute
+		#TODO: check that room is only one
+		print("in widget add room")
+		fake_participant_data = [False, False, True, False]*4
+		rowPosition = self.rowCount()
+		self.insertRow(rowPosition)
+		for i, is_available in enumerate(fake_participant_data):
+			cell_widget = self.available_checkboxes[i]
+			enabled = cell_widget.chk_bx.isEnabled()
+			cell_widget.chk_bx.setEnabled(enabled and is_available)
+			print(cell_widget.chk_bx.isEnabled())
+
+			checked = QtCore.Qt.Checked if is_available else QtCore.Qt.Unchecked
+			participant_cell_widget = ScheduleCheckBoxWidget(checked=checked)
+			self.setCellWidget(rowPosition, i+1, participant_cell_widget)
 
 
 
