@@ -125,12 +125,20 @@ class AddUser(QtWidgets.QDialog):
             QtWidgets.QMessageBox.warning(
                 self, 'Error', 'Password is required') 
 
-        employee = employee_data.add_employee(username, password)           
+        if username and password:
+            if self._check_username(username):
+                employee = employee_data.add_employee(username, password)           
 
-        print(password)
-        self.parent().delete_user_list()
-        self.parent().populate_user_list()
-        self.close()
+                print(password)
+                self.parent().delete_user_list()
+                self.parent().populate_user_list()
+                self.close()
+            else:
+                QtWidgets.QMessageBox.warning(
+                    self, 'Error', 'Username already exists')                
+
+    def _check_username(self, username):
+        return employee_data.check_employee_exists(username)
 
     def cancel(self):
         print("cancel")
@@ -180,9 +188,12 @@ class ManageUsers(QtWidgets.QFrame, Ui_ManageUsers):
             self.btn.clicked.connect(self.showGeneratePassword)
             self.tableWidget.setCellWidget(rowPosition, 2, self.btn)
 
-            self.delete_btn = QtWidgets.QPushButton("Delete")
-            self.delete_btn.clicked.connect(self.showDeleteUser)
-            self.tableWidget.setCellWidget(rowPosition, 3, self.delete_btn)
+            print(employee)
+            print(self.user)
+            if employee != self.user:
+                self.delete_btn = QtWidgets.QPushButton("Delete")
+                self.delete_btn.clicked.connect(self.showDeleteUser)
+                self.tableWidget.setCellWidget(rowPosition, 3, self.delete_btn)
 
 
     def delete_user_list(self):

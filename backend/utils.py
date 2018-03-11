@@ -61,7 +61,15 @@ class EmployeeData:
 		except Exception as e:
 			session.rollback()
 			handle_exception()
-			return False		
+			return False
+
+	def check_employee_exists(self, username):
+		employees = session.query(Employee).filter(
+			Employee.username == username
+			).all()
+		if len(employees) == 0:
+			return True
+		return False	
 
 
 class EmployeeMeetingData:
