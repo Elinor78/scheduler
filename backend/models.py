@@ -13,7 +13,7 @@ Base = declarative_base()
 session = scoped_session(sessionmaker())
 
 class EmployeeMeeting(Base):
-    __tablename__ = 'association'
+    __tablename__ = 'employeemeeting'
     employee_id = Column(Integer, ForeignKey('employee.id'), primary_key=True)
     meeting_id = Column(Integer, ForeignKey('meeting.id'), primary_key=True)
     pending = Column(Boolean, default=True)
@@ -26,8 +26,8 @@ class Employee(Base):
     __tablename__ = 'employee'
 
     id = Column(Integer, primary_key=True)
-    first_name = Column(String(100), nullable=True)
-    last_name = Column(String(100), nullable=True)
+    first_name = Column(String(100), nullable=True, default="")
+    last_name = Column(String(100), nullable=True, default="")
     username = Column(String(100), unique=True, nullable=False)
     password = Column(String(100), nullable=False)
     email = Column(String(100), nullable=True)
@@ -43,6 +43,7 @@ association_table = Table('timeblock', Base.metadata,
 class Meeting(Base):
     __tablename__ = 'meeting'
     id = Column(Integer, primary_key=True)
+    title = Column(String(100), nullable=False)
     room = Column(Integer, ForeignKey("room.id"))
     owner = Column(Integer, ForeignKey("employee.id"))
     date = Column(Date, nullable=False)
@@ -92,7 +93,7 @@ class TimeSlot(Base):
 
 
 def init_db(dbname):
-    engine = create_engine(dbname, echo=True)
+    engine = create_engine(dbname, echo=False)
     session.configure(bind=engine, autoflush=False, expire_on_commit=False)
     Base.metadata.create_all(engine)
     return engine

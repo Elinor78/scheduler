@@ -9,8 +9,12 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from custom_widgets import ScheduleTableWidget
 import datetime
-from backend.utils import EmployeeData, RoomData
-
+from backend.utils import EmployeeData, RoomData, MeetingData, TimeSlotData, EmployeeMeetingData
+from frontend.utils import checksequential, _translate_slot_forward_key
+roomdata = RoomData()
+meeting_data = MeetingData()
+timeslot_data = TimeSlotData()
+employeemeeting_data = EmployeeMeetingData()
 
 class Ui_schedulemeeting(object):
     def setupUi(self, schedulemeeting):
@@ -35,7 +39,7 @@ class Ui_schedulemeeting(object):
         self.dateLabel.setObjectName("dateLabel")
         self.formLayout.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.dateLabel)
         self.dateDateEdit = QtWidgets.QDateEdit(self.formLayoutWidget)
-        self.dateDateEdit.setMinimumDate(QtCore.QDate(2018, 3, 1))
+        self.dateDateEdit.setMinimumDate(QtCore.QDate(datetime.date.today()))
         self.dateDateEdit.setCalendarPopup(True)
         self.dateDateEdit.setObjectName("dateDateEdit")
         self.formLayout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.dateDateEdit)
@@ -129,8 +133,6 @@ class Ui_schedulemeeting(object):
         #self.timeLabel.setText(_translate("schedulemeeting", "Time"))
         #self.durationLabel.setText(_translate("schedulemeeting", "Duration"))
         self.label.setText(_translate("schedulemeeting", "Description"))
-        item = self.tableWidget.verticalHeaderItem(1)
-        item.setText(_translate("schedulemeeting", "Owner"))
         item = self.tableWidget.horizontalHeaderItem(0)
         item.setText(_translate("schedulemeeting", "Participants"))
         item = self.tableWidget.horizontalHeaderItem(1)
@@ -182,12 +184,21 @@ class ScheduleMeeting(QtWidgets.QFrame, Ui_schedulemeeting):
         self.add_room_button.clicked.connect(self._add_room)
         self.save_button.clicked.connect(self.save_meeting)
         self.to_add_participant = None
+        self.added_room = None
+        self.tableWidget.date = datetime.datetime.strptime(self.dateDateEdit.text(), '%B %d, %Y').date()
+        self.dateDateEdit.calendarWidget().clicked.connect(self._add_date)
+
+    def _add_date(self):
+        print("in _add_date")
+        self.tableWidget.date = datetime.datetime.strptime(self.dateDateEdit.text(), '%B %d, %Y').date()
+        self.tableWidget.reset_table()#if room already updated...
 
     def _add_room(self):
         self.room_search = SearchRoom(self)
         self.room_search.show()
 
     def add_room(self, roomname):
+        print(dir(self.dateDateEdit.calendarWidget))
         self.tableWidget.add_room(roomname)
 
     def _add_participant(self):
@@ -212,11 +223,49 @@ class ScheduleMeeting(QtWidgets.QFrame, Ui_schedulemeeting):
     def save_meeting(self):
         #TODO - whole bunch
         print("A")
-        self._check_date()
-        self._check_title()
+        if self._check_date() and self._check_title():
+            _times = self._check_times()
+            if _times:
+                room = self.tableWidget.chosen_room.id if self.tableWidget.chosen_room else 0
+                participants = [self.user] + self.tableWidget.participants
+                print ("passed")
+                m = meeting_data.create_meeting(
+                    self.titleLineEdit.text(), 
+                    room, 
+                    self.user.id,
+                    self.tableWidget.date,
+                    _times,
+                    participants
+                    )
+                em = employeemeeting_data.get_employee_meeting(m.id, self.user.id)
+                employeemeeting_data.update_employee_meeting(em, {'pending': False, 'accepted': True})
 
-        print(self.tableWidget.participants)
-        print("B")
+                self.tableWidget.participants = []
+                self.tableWidget.chosen_room = None
+                self.tableWidget.reset_table()
+
+                self.titleLineEdit.setText("")
+                self.dateDateEdit.setDate(QtCore.QDate(datetime.date.today()))
+
+
+
+
+    def _check_times(self):
+        _times = []
+        for i, cell_widget in enumerate(self.tableWidget.available_checkboxes):
+            if cell_widget.chk_bx.checkState() == 2:
+                _times.append(i)
+        if _times:
+            if not checksequential(_times):
+                QtWidgets.QMessageBox.warning(
+                        self, 'Error', 'Must have sequential meeting times') 
+                return False
+        else:
+            QtWidgets.QMessageBox.warning(
+                    self, 'Error', 'Must select meeting times') 
+            return False
+        _times = [_translate_slot_forward_key(t) for t in _times]
+        return timeslot_data.bulk_create_timeslots(_times)  
 
     def _check_date(self):
         print(type(self.dateDateEdit.text()))
@@ -226,20 +275,32 @@ class ScheduleMeeting(QtWidgets.QFrame, Ui_schedulemeeting):
         today = datetime.date.today()
         print (_date.weekday())
         #weekday is less than 5
+        #TDOD move this check to room choice, not save
         if _date.weekday() >= 5:#saturday and sunday
             QtWidgets.QMessageBox.warning(
                     self, 'Error', 'Cannot schedule meetings on weekends')
-        if today < _date < today + margin:
+            return False
+        if today <= _date < today + margin:
             pass
         else:
             QtWidgets.QMessageBox.warning(
-                    self, 'Error', 'Meetings must be scheduled within 14 days of today')    
+                    self, 'Error', 'Meetings must be scheduled within 14 days of today')   
+            return False 
+        self.tableWidget.date = _date
+        return True
 
     def _check_title(self):
         if self.titleLineEdit.text() == "":
             QtWidgets.QMessageBox.warning(
                 self, 'Error', "Must include meeting title")
-        print(self.titleLineEdit.text())    
+            return False
+        print(self.titleLineEdit.text()) 
+        return True
+
+    def _get_chosen_room(self):
+        print("In ScheduleMeeting _get_chosen_room")
+        print(self.tableWidget.chosen_room)
+
 
 
 
@@ -344,9 +405,14 @@ class SearchRoom(QtWidgets.QDialog, Ui_SearchRoom):
         self.setupUi(self) 
         self.to_add_room = None
         self.Add_button.clicked.connect(self.add)
+        self.rooms = roomdata.get_all_rooms()
 
     def add(self):
-        self.to_add_room = self.search_lineedit.text()
+        roomname = self.search_lineedit.text()
+        for room in self.rooms:
+            if room.roomname == roomname:
+                self.to_add_room = room 
+                break
         self.parent().add_room(self.to_add_room)
         self.close()
 
@@ -360,7 +426,6 @@ class RoomSearchWidget(QtWidgets.QLineEdit):
         model.setStringList(self.get_rooms())
 
     def get_rooms(self):
-        roomdata = RoomData()
         return [e.roomname for e in roomdata.get_all_rooms()]
 
 

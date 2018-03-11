@@ -16,6 +16,7 @@ class Ui_ManageRooms(object):
         ManageRooms.setObjectName("ManageRooms")
         ManageRooms.resize(581, 391)
         ManageRooms.setGeometry(QtCore.QRect(230, 30, 581, 391))
+        
         self.tableWidget = QtWidgets.QTableWidget(ManageRooms)
         self.tableWidget.setGeometry(QtCore.QRect(15, 11, 551, 311))
         self.tableWidget.setObjectName("tableWidget")
@@ -33,8 +34,10 @@ class Ui_ManageRooms(object):
         self.tableWidget.setHorizontalHeaderItem(4, item)
         item = QtWidgets.QTableWidgetItem()
         self.tableWidget.setHorizontalHeaderItem(5, item)
+        
         self.tableWidget.horizontalHeader().setDefaultSectionSize(90)
         self.tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        
         self.add_room_button = QtWidgets.QPushButton(ManageRooms)
         self.add_room_button.setGeometry(QtCore.QRect(430, 340, 113, 32))
         self.add_room_button.setObjectName("add_room_button")

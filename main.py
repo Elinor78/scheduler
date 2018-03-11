@@ -34,11 +34,11 @@ class Scheduler(QtWidgets.QMainWindow, Ui_MainWindow):
         self.manage_users_button.clicked.connect(self.showManageUsers)
 
     def is_admin(self):
-        return True
+        return self.user.is_admin
 
     def showDailySchedule(self):
         self.frame.hide()
-        self.frame = DailySchedule(self)
+        self.frame = DailySchedule(self.user, self)
         self.frame.show()
 
     def showScheduleMeeting(self):

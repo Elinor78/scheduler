@@ -1,7 +1,7 @@
-from backend.models import Base, session, init_db, Employee, EmployeeMeeting, Meeting, Room
+from backend.models import Base, session, init_db, Employee, EmployeeMeeting, Meeting, Room, TimeSlot
 import os
 from sqlalchemy import exc
-
+from sqlalchemy import or_
 
 def handle_exception():
 	init_db('sqlite:///sqlalchemy_example.db')
@@ -32,8 +32,8 @@ class EmployeeData:
 		return employee
 
 	def get_employee_meetings(self, employee_id):
-		a = session.query(Employee).join(EmployeeMeeting, Employee.meetings).join(Meeting, EmployeeMeeting.meeting).filter(Employee.id == employee_id)
-		return a.all()
+		a = self.get_employee(employee_id)
+		return a.meetings
 
 	def get_all_employees(self):
 		return session.query(Employee).all()
@@ -64,11 +64,99 @@ class EmployeeData:
 			return False		
 
 
+class EmployeeMeetingData:
+	def get_employee_meeting(self, meeting_id, employee_id):
+		return session.query(EmployeeMeeting).filter(
+			EmployeeMeeting.meeting_id == meeting_id).filter(
+			EmployeeMeeting.employee_id == employee_id).one()
+
+	def update_employee_meeting(self, emp_meet, kwargs):
+		for kwarg, value in kwargs.items():
+			setattr(emp_meet, kwarg, value)
+		session.commit()
+
+	def accept_meeting(self, employee_meeting):
+		employee_meeting.pending = False
+		employee_meeting.accepted = True
+		session.commit()
+
+	def decline_meeting(self, employee_meeting):
+		employee_meeting.pending = False
+		employee_meeting.accepted = False
+		session.delete(employee_meeting)
+		session.commit()			
+
+
 class MeetingData:
 	def add_employees_to_meeting(self):
 		pass
 
+	def create_meeting(self, title, room_id, owner_id, date, timeslots=None, employees=None):
+		meeting = Meeting(title=title, room=room_id, owner=owner_id, date=date)
+		
+		if employees:
+			for employee in employees:
+				rel = EmployeeMeeting()
+				rel.employee = employee
+				meeting.employees.append(rel)
 
+
+		if timeslots:
+			meeting.timeslots = timeslots
+
+		session.add(meeting)
+		session.flush()
+		meeting_id = meeting.id
+		session.commit()
+		return session.query(Meeting).filter(Meeting.id == meeting_id).one()
+
+	def get_meetings_by_date_and_user(self, date, employee):
+		meetings = session.query(Meeting).join(
+			EmployeeMeeting).filter(
+			Meeting.date == date).filter(
+			EmployeeMeeting.employee == employee).filter(
+			or_(
+				EmployeeMeeting.pending == True,
+				EmployeeMeeting.accepted == True
+				)).all()
+		return meetings
+
+	def get_meetings_by_user(self, employee):
+		meetings = session.query(Meeting).join(
+			EmployeeMeeting).filter(
+			EmployeeMeeting.employee == employee).all()
+		return meetings	
+
+	def get_owned_meetings(self, owner_id):
+		meetings = session.query(Meeting).filter(
+			Meeting.owner == owner_id
+			).all()
+		return meetings
+
+class TimeSlotData:
+	def create_timeslot(self, begin_time, meetings=None):
+		timeslot = TimeSlot(begin_time=begin_time)
+		print (timeslot.id)
+		if meetings:
+			timeslot.meetings = meetings
+		session.add(timeslot)
+		session.flush()
+		timeslot_id = timeslot.id
+		session.commit()
+		return self.get_timeslot(timeslot_id)
+
+	def get_timeslot(self, timeslot_id):
+		return session.query(TimeSlot).filter(TimeSlot.id == timeslot_id).one()
+
+	def bulk_create_timeslots(self, times):
+		_times = []
+		for time in times:
+			timeslot = TimeSlot(begin_time=time)
+			session.add(timeslot)
+			session.flush()
+			_times.append(self.get_timeslot(timeslot.id))
+		session.commit()
+		return _times
 
 class RoomData:
 	def add_room(self, roomname, number, building, capacity=None):
@@ -111,6 +199,9 @@ class RoomData:
 	def delete_room(self, room):
 		session.delete(room)
 		session.commit()
+
+	def get_room_meetings_by_date(self, room, date):
+		return session.query(Meeting).filter(Meeting.room == room.id).filter(Meeting.date == date).all()
 
 if __name__ == '__main__':
 	engine = init_db('sqlite:///sqlalchemy_example.db')	

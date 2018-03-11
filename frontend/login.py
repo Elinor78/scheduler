@@ -172,6 +172,7 @@ class Login(QtWidgets.QDialog, Ui_Login):
         employeedata = EmployeeData()
         try:
             user = employeedata.get_employee_by_username(self.username_lineedit.text())
+            print(user.password)
             if user.password == self.password_lineedit.text():
                 self.user = user
                 self.accept()
