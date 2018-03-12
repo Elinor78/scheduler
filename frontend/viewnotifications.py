@@ -166,7 +166,11 @@ class ViewNotifications(QtWidgets.QFrame, Ui_ViewNotifications):
         self.accept_meeting.show()
 
     def cancel_meeting(self):
-        print("cancel_meeting")
+        print("accept_decline")
+        button = self.sender()
+        index = self.tableWidget.indexAt(button.pos())
+        self.accept_meeting = CancelMeeting(self.employee_meetings[index.row()], self)
+        self.accept_meeting.show()
 
     def show_time(self, times):
         print(times)
@@ -219,6 +223,44 @@ class ViewNotifications(QtWidgets.QFrame, Ui_ViewNotifications):
         }
         return tmp[i]
 
+class CancelMeeting(QtWidgets.QDialog):
+    def __init__(self, meeting, parent=None):
+        super(CancelMeeting, self).__init__(parent)
+        self.meeting = meeting
+        self.setObjectName("Cancel Metting")
+        self.resize(357, 196)
+        self.setSizeGripEnabled(False)
+        self.setModal(True)
+        self.buttonBox = QtWidgets.QDialogButtonBox(self)
+        self.buttonBox.setGeometry(QtCore.QRect(20, 150, 321, 32))
+        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.No|QtWidgets.QDialogButtonBox.Yes)
+        # self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setText("Accept")
+        # self.buttonBox.button(QtWidgets.QDialogButtonBox.Cancel).setText("Decline")
+        self.buttonBox.setObjectName("buttonBox")
+        self.label = QtWidgets.QLabel(self)
+        self.label.setGeometry(QtCore.QRect(70, 50, 221, 16))
+        font = QtGui.QFont()
+        font.setPointSize(14)
+        self.label.setFont(font)
+        self.label.setObjectName("label")
+        self.label.setText("Cancel Meeting?")   
+
+
+        self.buttonBox.accepted.connect(self.cancel)
+        self.buttonBox.rejected.connect(self.keep)
+
+    def cancel(self):
+        print("cancel")
+        print(self.meeting)
+        tmp = self.meeting.id
+        meeting_data.delete_meeting(self.meeting)
+        self.parent().populate_meetings()
+        self.close()
+
+
+    def keep(self):
+        print("keep")
+        self.close()
 
 class AcceptMeeting(QtWidgets.QDialog):
     def __init__(self, employee_meeting, parent=None):

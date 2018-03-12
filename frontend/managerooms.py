@@ -204,7 +204,7 @@ class AddRoom(QtWidgets.QDialog):
                 self.close()
             else:
                 QtWidgets.QMessageBox.warning(
-                    self, 'Error', 'Integrity Error')                 
+                    self, 'Error', 'Integrity Error. Check data.')                 
 
     def validate_is_int(self, input, field):
         try:

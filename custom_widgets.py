@@ -11,6 +11,7 @@ meeting_data = MeetingData()
 class ScheduleTableWidget(QtWidgets.QTableWidget):
     def __init__(self, user, parent=None):
         super(ScheduleTableWidget, self).__init__(parent)
+        self.setGeometry(1,66,256,192)
         self.verticalHeader().hide()
         self.date = datetime.date.today()
         self.user = user
@@ -93,33 +94,47 @@ class ScheduleTableWidget(QtWidgets.QTableWidget):
                 cell_widget.chk_bx.hide()        
 
     def add_participant(self, username):
-        participant = employee_data.get_employee_by_username(username)
-        if participant not in self.participants:#can't use this in update
-            self.participants.append(participant)
-            participant_availability = self._get_employee_meetings(participant)
-            rowPosition = self.rowCount()
-            self.insertRow(rowPosition)
+        print("in add_participant")
+        print(username)
+        print(self.user.username)
+        if username != self.user.username:
+            if self._check_username(username):
+                participant = employee_data.get_employee_by_username(username)
+                if participant not in self.participants:#can't use this in update
+                    self.participants.append(participant)
+                    participant_availability = self._get_employee_meetings(participant)
+                    rowPosition = self.rowCount()
+                    self.insertRow(rowPosition)
 
-            item = QtWidgets.QTableWidgetItem(username)
-            item.setTextAlignment(QtCore.Qt.AlignCenter)
-            self.setItem(rowPosition, 0, item)
+                    item = QtWidgets.QTableWidgetItem(username)
+                    item.setTextAlignment(QtCore.Qt.AlignCenter)
+                    self.setItem(rowPosition, 0, item)
 
-            for i, is_available in enumerate(participant_availability):
+                    for i, is_available in enumerate(participant_availability):
 
-                cell_widget = self.available_checkboxes[i]
-                enabled = cell_widget.chk_bx.isEnabled()
-                if enabled and is_available:
-                    cell_widget.chk_bx.setEnabled(enabled and is_available)
-                    print(cell_widget.chk_bx.isEnabled())
+                        cell_widget = self.available_checkboxes[i]
+                        enabled = cell_widget.chk_bx.isEnabled()
+                        if enabled and is_available:
+                            cell_widget.chk_bx.setEnabled(enabled and is_available)
+                            print(cell_widget.chk_bx.isEnabled())
 
-                    checked = QtCore.Qt.Checked if is_available else QtCore.Qt.Unchecked
-                    participant_cell_widget = ScheduleCheckBoxWidget(checked=checked)
-                    self.setCellWidget(rowPosition, i+1, participant_cell_widget)
+                            checked = QtCore.Qt.Checked if is_available else QtCore.Qt.Unchecked
+                            participant_cell_widget = ScheduleCheckBoxWidget(checked=checked)
+                            self.setCellWidget(rowPosition, i+1, participant_cell_widget)
+                        else:
+                            cell_widget.chk_bx.hide()
                 else:
-                    cell_widget.chk_bx.hide()
+                    QtWidgets.QMessageBox.warning(
+                            self, 'Error', 'Employee already in meeting.')  
+            else:
+                QtWidgets.QMessageBox.warning(
+                            self, 'Error', 'Invalid employee username')
         else:
             QtWidgets.QMessageBox.warning(
-                    self, 'Error', 'Employee already in meeting.')             
+                        self, 'Error', 'Cannot add owner to meeting')           
+
+    def _check_username(self, username):
+        return employee_data.check_username(username)           
 
     def check_availability(self):
         pass 

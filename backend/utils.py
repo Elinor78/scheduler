@@ -69,7 +69,16 @@ class EmployeeData:
 			).all()
 		if len(employees) == 0:
 			return True
-		return False	
+		return False
+
+	def check_username(self, username):
+		employees = session.query(Employee).filter(
+			Employee.username == username
+			).all()
+		if len(employees) == 1:
+			return True 
+		else:
+			return False		
 
 
 class EmployeeMeetingData:
@@ -140,6 +149,12 @@ class MeetingData:
 			Meeting.owner == owner_id
 			).all()
 		return meetings
+
+	def delete_meeting(self, meeting):
+		for em in meeting.employees:
+			session.delete(em)
+		session.delete(meeting)
+		session.commit()		
 
 class TimeSlotData:
 	def create_timeslot(self, begin_time, meetings=None):
