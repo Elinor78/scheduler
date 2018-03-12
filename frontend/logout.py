@@ -37,3 +37,11 @@ class Logout(QtWidgets.QDialog, Ui_Logout):
     def __init__(self, user, parent=None):
         super(Logout, self).__init__(parent)
         self.setupUi(self) 
+        self.buttonBox.accepted.connect(self.logout)
+        self.buttonBox.rejected.connect(self.remain)
+
+    def logout(self):
+        self.parent().close()
+
+    def remain(self):
+        self.close()

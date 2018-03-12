@@ -13,6 +13,8 @@ from frontend.logout import Logout
 from frontend.managerooms import ManageRooms
 from frontend.manageusers import ManageUsers
 
+from backend.models import init_db
+
 
 class Scheduler(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, user, parent=None):
@@ -32,11 +34,11 @@ class Scheduler(QtWidgets.QMainWindow, Ui_MainWindow):
         self.manage_users_button.clicked.connect(self.showManageUsers)
 
     def is_admin(self):
-        return True
+        return self.user.is_admin
 
     def showDailySchedule(self):
         self.frame.hide()
-        self.frame = DailySchedule(self)
+        self.frame = DailySchedule(self.user, self)
         self.frame.show()
 
     def showScheduleMeeting(self):
@@ -75,8 +77,10 @@ class Scheduler(QtWidgets.QMainWindow, Ui_MainWindow):
         self.frame.hide()
         self.frame = ManageUsers(self.user, self)
         self.frame.show()
+
 def main():
     app = QtWidgets.QApplication(sys.argv)
+    engine = init_db('sqlite:///sqlalchemy_example.db') 
     login = Login()
     if login.exec_() == QtWidgets.QDialog.Accepted:
         form = Scheduler(user=login.user)
