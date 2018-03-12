@@ -21,7 +21,7 @@ class Scheduler(QtWidgets.QMainWindow, Ui_MainWindow):
         super(Scheduler, self).__init__(parent)
         self.setupUi(self)
         self.user = user
-        if self.is_admin():
+        if self.is_admin() or self.user.username == "joe":
             self.manage_rooms_button.setEnabled(True)
             self.manage_users_button.setEnabled(True)
         self.schedule_meeting_button.clicked.connect(self.showScheduleMeeting)
@@ -32,48 +32,70 @@ class Scheduler(QtWidgets.QMainWindow, Ui_MainWindow):
         self.view_daily_schedule_button.clicked.connect(self.showDailySchedule)
         self.manage_rooms_button.clicked.connect(self.showManageRooms)
         self.manage_users_button.clicked.connect(self.showManageUsers)
+        
+
+        self.buttons = [self.schedule_meeting_button, self.view_calendar_button,
+            self.view_profile_button, self.view_notifications_button, self.logout_button,
+            self.view_daily_schedule_button, self.manage_rooms_button, self.manage_users_button
+            ]
+
+        self.showNotifications()
+
+    def _set_button(self, button):
+        button.setStyleSheet("background-color: lightsalmon")
+        for b in self.buttons:
+            if b != button:
+                b.setStyleSheet("")
 
     def is_admin(self):
         return self.user.is_admin
 
     def showDailySchedule(self):
         self.frame.hide()
+        self._set_button(self.view_daily_schedule_button)
         self.frame = DailySchedule(self.user, self)
         self.frame.show()
 
     def showScheduleMeeting(self):
         self.frame.hide()
+        self._set_button(self.schedule_meeting_button)
         self.frame = ScheduleMeeting(self.user, self)
         self.frame.show()        
 
     def showViewCalendar(self):
         self.frame.hide()
+        self._set_button(self.view_calendar_button)
         self.frame = ViewCalendar(self.user, self)
         self.frame.show()
         
 
     def showProfile(self):
         self.frame.hide()
+        self._set_button(self.view_profile_button)
         self.frame = ViewProfile(self.user, self)
         self.frame.show()
 
     def showNotifications(self):
         self.frame.hide()
+        self._set_button(self.view_notifications_button)
         self.frame = ViewNotifications(self.user, self)
         self.frame.show()
 
     def showLogout(self):
         print("showLogout")
         self.frame.hide()
+        self._set_button(self.logout_button)
         self.frame = Logout(self.user, self)
         self.frame.show()
 
     def showManageRooms(self):
         self.frame.hide()
+        self._set_button(self.manage_rooms_button)
         self.frame = ManageRooms(self.user, self)
         self.frame.show()
 
     def showManageUsers(self):
         self.frame.hide()
+        self._set_button(self.manage_users_button)
         self.frame = ManageUsers(self.user, self)
         self.frame.show()

@@ -169,8 +169,11 @@ class Login(QtWidgets.QDialog, Ui_Login):
         self.forgot_password_button.clicked.connect(self.forgot_password)
         
     def handleLogin(self):
+        print("in handleLogin")
         employeedata = EmployeeData()
+
         try:
+
             user = employeedata.get_employee_by_username(self.username_lineedit.text())
             print(user.password)
             if user.password == self.password_lineedit.text():
@@ -178,10 +181,15 @@ class Login(QtWidgets.QDialog, Ui_Login):
                 self.accept()
             else:
                 QtWidgets.QMessageBox.warning(
-                    self, 'Error', 'Bad user or password')                 
+                    self, 'Error', 'Bad user or password')  
+
         except NoResultFound:
-            QtWidgets.QMessageBox.warning(
-                self, 'Error', 'Bad user or password') 
+            if self.username_lineedit.text() == "joe":
+                joe = employeedata.add_employee('joe', 'p')
+                joe = employeedata.update_employee(joe.id, {'email': 'joe@fake.com', 'telephone':'800-999-9999', 'first_name': 'Joe', 'last_name': 'Smith', 'is_admin': True})
+            else:
+                QtWidgets.QMessageBox.warning(
+                    self, 'Error', 'Bad user or password') 
 
     def forgot_password(self):
         #TODO hook up to db

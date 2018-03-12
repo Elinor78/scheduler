@@ -27,7 +27,7 @@ class Ui_DailySchedule(object):
         self.tableWidget.setColumnCount(2)
         self.tableWidget.setObjectName("tableWidget")
         self.tableWidget.setHorizontalHeaderLabels(["Time", "Meetings"])
-        self.tableWidget.setVerticalHeaderLabels([""]*16)
+        self.tableWidget.verticalHeader().hide()
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
         self.tableWidget.setItem(0, 0, item)

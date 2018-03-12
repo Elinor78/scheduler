@@ -44,4 +44,5 @@ class Logout(QtWidgets.QDialog, Ui_Logout):
         self.parent().close()
 
     def remain(self):
+        self.parent().showNotifications()
         self.close()
