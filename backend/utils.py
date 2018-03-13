@@ -15,7 +15,6 @@ class EmployeeData:
 
 	def delete_employee(self, employee_id):
 		employee = session.query(Employee).filter(Employee.id == employee_id).one()
-		print (employee)
 		session.delete(employee)
 		session.commit()
 
@@ -37,14 +36,6 @@ class EmployeeData:
 
 	def get_all_employees(self):
 		return session.query(Employee).all()
-
-	def get_some_employees(self, employee_ids):
-		return session.query(Employee).filter(Employee.id in employee_ids).all()
-
-	def add_employee_to_meeting(self, meeting_id, employee_id):
-		employee_meeting = EmployeeMeeting(meeting_id=meeting_id, employee_id=employee_id)
-		session.add(employee_meeting)
-		session.commit()
 
 	def update_employee(self, employee_id, kwargs):
 		employee = self.get_employee(employee_id)
@@ -105,9 +96,6 @@ class EmployeeMeetingData:
 
 
 class MeetingData:
-	def add_employees_to_meeting(self):
-		pass
-
 	def create_meeting(self, title, room_id, owner_id, date, timeslots=None, employees=None):
 		meeting = Meeting(title=title, room=room_id, owner=owner_id, date=date)
 		
@@ -157,17 +145,6 @@ class MeetingData:
 		session.commit()		
 
 class TimeSlotData:
-	def create_timeslot(self, begin_time, meetings=None):
-		timeslot = TimeSlot(begin_time=begin_time)
-		print (timeslot.id)
-		if meetings:
-			timeslot.meetings = meetings
-		session.add(timeslot)
-		session.flush()
-		timeslot_id = timeslot.id
-		session.commit()
-		return self.get_timeslot(timeslot_id)
-
 	def get_timeslot(self, timeslot_id):
 		return session.query(TimeSlot).filter(TimeSlot.id == timeslot_id).one()
 

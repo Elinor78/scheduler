@@ -136,9 +136,6 @@ class ScheduleTableWidget(QtWidgets.QTableWidget):
     def _check_username(self, username):
         return employee_data.check_username(username)           
 
-    def check_availability(self):
-        pass 
-
     def add_room(self, room):
         if self.date:
             if not self.chosen_room:

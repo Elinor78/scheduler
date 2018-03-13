@@ -278,12 +278,6 @@ class ScheduleMeeting(QtWidgets.QFrame, Ui_schedulemeeting):
         print(self.titleLineEdit.text()) 
         return True
 
-    def _get_chosen_room(self):
-        print("In ScheduleMeeting _get_chosen_room")
-        print(self.tableWidget.chosen_room)
-
-
-
 
 class Ui_SearchParticipant(object):
     def setupUi(self, SearchParticipant):
@@ -334,12 +328,8 @@ class SearchParticipant(QtWidgets.QDialog, Ui_SearchParticipant):
 class EmployeeSearchWidget(QtWidgets.QLineEdit):
     def __init__(self, parent=None):
         super(EmployeeSearchWidget, self).__init__(parent)
-        #self.edit = QtWidgets.QLineEdit()
         completer = QtWidgets.QCompleter()
         self.setCompleter(completer)
-
-
-
         model = QtCore.QStringListModel()
         completer.setModel(model)
         model.setStringList(self.get_employees())
