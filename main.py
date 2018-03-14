@@ -1,15 +1,8 @@
 from PyQt5 import QtGui, QtWidgets
 import sys
-
-
 from frontend.login import Login
 from frontend.scheduler import Scheduler
-
-
 from backend.models import init_db
-
-
-
 
 def main():
     app = QtWidgets.QApplication(sys.argv)

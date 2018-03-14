@@ -169,7 +169,6 @@ class Login(QtWidgets.QDialog, Ui_Login):
         self.forgot_password_button.clicked.connect(self.forgot_password)
         
     def handleLogin(self):
-        print("in handleLogin")
         employeedata = EmployeeData()
 
         try:

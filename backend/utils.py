@@ -19,6 +19,8 @@ class EmployeeData:
 		session.commit()
 
 	def delete_employee_obj(self, employee):
+		for em in employee.meetings:
+			session.delete(em)
 		session.delete(employee)
 		session.commit()
 
@@ -197,6 +199,11 @@ class RoomData:
 			return False
 
 	def delete_room(self, room):
+		meetings = session.query(Meeting).filter(Meeting.room == room.id).all()
+		for m in meetings:
+			for em in m.employees:
+				session.delete(em)
+			session.delete(m)
 		session.delete(room)
 		session.commit()
 

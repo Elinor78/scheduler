@@ -9,7 +9,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from backend.utils import MeetingData
 import datetime
-from frontend.utils import _translate_slot_backward_key, _translate_slot_backward
+from frontend.utils import _translate_slot_backward_key, _translate_slot_backward, _translate_slot_forward
 
 
 meeting_data = MeetingData()
@@ -93,60 +93,14 @@ class ViewCalendar(QtWidgets.QFrame, Ui_ViewCalendar):
         return time
 
     def show_time(self, times):
-        print(times)
-        print(times[0])
-        print(times[-1])
-        start = self._translate_slot_forward(times[0])
-        end = self._translate_slot_forward(times[-1] + 1)
+        start = _translate_slot_forward(times[0])
+        end = _translate_slot_forward(times[-1] + 1)
         return "{} - {}".format(start, end)
 
     def delete_meeting_list(self):
         for i in reversed(range(self.tableWidget.rowCount())):
             self.tableWidget.removeRow(i)
 
-
-    def _translate_slot_backward(self, i):
-        tmp = {
-            "9:00 am": 0,
-            "9:30 am": 1,
-            "10:00 am": 2,
-            "10:30 am": 3,
-            "11:00 am": 4,
-            "11:30 am": 5,
-            "12:00 pm": 6,
-            "12:30 pm": 7,
-            "1:00 pm": 8,
-            "1:30 pm": 9,
-            "2:00 pm": 10,
-            "2:30 pm": 11,
-            "3:00 pm": 12,
-            "3:30 pm": 13,
-            "4:00 pm": 14,
-            "4:30 pm": 15
-        }
-        return tmp[i]
-
-    def _translate_slot_forward(self, i):
-        tmp = {
-            0: "9:00 am",
-            1: "9:30 am",
-            2: "10:00 am",
-            3: "10:30 am",
-            4: "11:00 am",
-            5:"11:30 am",
-            6: "12:00 pm",
-            7: "12:30 pm",
-            8:  "1:00 pm",
-            9: "1:30 pm",
-            10: "2:00 pm",
-            11: "2:30 pm",
-            12:  "3:00 pm",
-            13:  "3:30 pm",
-            14:  "4:00 pm",
-            15: "4:30 pm",
-            16: "5:00 pm"
-        }
-        return tmp[i]
 
 
 

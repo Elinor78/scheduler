@@ -104,14 +104,8 @@ class ManageRooms(QtWidgets.QFrame, Ui_ManageRooms):
 
 
     def showEditRoom(self):
-        print("showEditRoom")
         button = self.sender()
         index = self.tableWidget.indexAt(button.pos())
-        print(index)
-        print(index.row())
-        print (index.column())
-        #print(self.rooms[index.row()].id)
-
         self.edit_room = EditRoom(self.rooms[index.row()], self)
         self.edit_room.show()
 

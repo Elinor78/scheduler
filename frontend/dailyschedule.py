@@ -142,19 +142,6 @@ class DailySchedule(QtWidgets.QFrame, Ui_DailySchedule):
     def get_current_meetings(self):
         today = datetime.date.today()
         meetings = meeting_data.get_meetings_by_date_and_user(date=today, employee=self.user)
-        print(meetings)
-        print([m.timeslots for m in meetings])
-        '''
-        zipped = zip(
-            [m.title for m in meetings],
-            [[self._translate_slot_backward(ts.begin_time.value) for ts in m.timeslots] for m in meetings]
-            )
-        for title, times in zipped:
-            for time in times:
-                item = QtWidgets.QTableWidgetItem(title)
-                item.setTextAlignment(QtCore.Qt.AlignCenter)
-                self.tableWidget.setItem(time, 1, item)
-        '''
         for m in meetings:
             for ts in m.timeslots:
                 if isinstance(ts.begin_time, str):
@@ -164,51 +151,6 @@ class DailySchedule(QtWidgets.QFrame, Ui_DailySchedule):
                 item = QtWidgets.QTableWidgetItem(m.title)
                 item.setTextAlignment(QtCore.Qt.AlignCenter)
                 self.tableWidget.setItem(time, 1, item)                
-
-
-
-
-    def _translate_slot_forward(self, i):
-        tmp = {
-            0: "9:00 am",
-            1: "9:30 am",
-            2: "10:00 am",
-            3: "10:30 am",
-            4: "11:00 am",
-            5:"11:30 am",
-            6: "12:00 pm",
-            7: "12:30 pm",
-            8:  "1:00 pm",
-            9: "1:30 pm",
-            10: "2:00 pm",
-            11: "2:30 pm",
-            12:  "3:00 pm",
-            13:  "3:30 pm",
-            14:  "4:00 pm",
-            15: "4:30 pm"
-        }
-        return tmp[i]
-
-    def _translate_slot_backward(self, i):
-        tmp = {
-            "9:00 am": 0,
-            "9:30 am": 1,
-            "10:00 am": 2,
-            "10:30 am": 3,
-            "11:00 am": 4,
-            "11:30 am": 5,
-            "12:00 pm": 6,
-            "12:30 pm": 7,
-            "1:00 pm": 8,
-            "1:30 pm": 9,
-            "2:00 pm": 10,
-            "2:30 pm": 11,
-            "3:00 pm": 12,
-            "3:30 pm": 13,
-            "4:00 pm": 14,
-            "4:30 pm": 15
-        }
-        return tmp[i]
 
 
 

@@ -8,7 +8,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from backend.utils import MeetingData, EmployeeData, EmployeeMeetingData
-from frontend.utils import _translate_slot_backward_key, _translate_slot_backward
+from frontend.utils import _translate_slot_backward_key, _translate_slot_backward, _translate_slot_forward
 
 meeting_data = MeetingData()
 employee_data = EmployeeData()
@@ -61,11 +61,6 @@ class ViewNotifications(QtWidgets.QFrame, Ui_ViewNotifications):
 
     def populate_meetings(self):
         meetings = meeting_data.get_meetings_by_user(self.user)
-        #meetings += meeting_data.get_owned_meetings(self.user.id)
-        print (meetings)
-        print ([m.id for m in meetings])
-        print("In populate_meetings")
-        print(meetings)
         num_meetings = len(meetings)
         self.tableWidget.setRowCount(num_meetings)
         zipped = zip(
@@ -177,52 +172,10 @@ class ViewNotifications(QtWidgets.QFrame, Ui_ViewNotifications):
         print(times)
         print(times[0])
         print(times[-1])
-        start = self._translate_slot_forward(times[0])
-        end = self._translate_slot_forward(times[-1] + 1)
+        start = _translate_slot_forward(times[0])
+        end = _translate_slot_forward(times[-1] + 1)
         return "{} - {}".format(start, end)
 
-    def _translate_slot_forward(self, i):
-        tmp = {
-            0: "9:00 am",
-            1: "9:30 am",
-            2: "10:00 am",
-            3: "10:30 am",
-            4: "11:00 am",
-            5:"11:30 am",
-            6: "12:00 pm",
-            7: "12:30 pm",
-            8:  "1:00 pm",
-            9: "1:30 pm",
-            10: "2:00 pm",
-            11: "2:30 pm",
-            12:  "3:00 pm",
-            13:  "3:30 pm",
-            14:  "4:00 pm",
-            15: "4:30 pm",
-            16: "5:00 pm"
-        }
-        return tmp[i]
-
-    def _translate_slot_backward(self, i):
-        tmp = {
-            "9:00 am": 0,
-            "9:30 am": 1,
-            "10:00 am": 2,
-            "10:30 am": 3,
-            "11:00 am": 4,
-            "11:30 am": 5,
-            "12:00 pm": 6,
-            "12:30 pm": 7,
-            "1:00 pm": 8,
-            "1:30 pm": 9,
-            "2:00 pm": 10,
-            "2:30 pm": 11,
-            "3:00 pm": 12,
-            "3:30 pm": 13,
-            "4:00 pm": 14,
-            "4:30 pm": 15
-        }
-        return tmp[i]
 
 class CancelMeeting(QtWidgets.QDialog):
     def __init__(self, meeting, parent=None):
@@ -291,27 +244,12 @@ class AcceptMeeting(QtWidgets.QDialog):
 
 
     def accept(self):
-        print("accept")
-        print (self.employee_meeting.pending)
-        m = self.employee_meeting.meeting_id 
-        e = self.employee_meeting.employee_id
         emp_meet_data.accept_meeting(self.employee_meeting)
-        em = emp_meet_data.get_employee_meeting(m, e)
-        print(em.accepted)
-        print(em.pending)
         self.parent().populate_meetings()
         self.close()
 
     def decline(self):
-        print("decline")
-        print (self.employee_meeting.pending)
-
-        m = self.employee_meeting.meeting_id 
-        e = self.employee_meeting.employee_id
         emp_meet_data.decline_meeting(self.employee_meeting)
-        #em = emp_meet_data.get_employee_meeting(m, e)
-        #print(em.accepted)
-        #print(em.pending)
         self.parent().populate_meetings()
         self.close()
 
